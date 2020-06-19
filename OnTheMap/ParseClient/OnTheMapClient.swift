@@ -32,7 +32,7 @@ class OnTheMapClient {
         
     var stringValue: String {
     switch self {
-    case .getStudentLocation: return Endpoints.base + "StudentLocation"
+    case .getStudentLocation: return Endpoints.base + "StudentLocation?limit=100&order=-updatedAt"
     case .putStudentLocation: return Endpoints.base + "StudentLocation/" + "\(Auth.objectId)"
     case .postASession: return Endpoints.base + "session"
     case .getPublicData: return Endpoints.base + "users/" + "\(Auth.uniqueKey)"

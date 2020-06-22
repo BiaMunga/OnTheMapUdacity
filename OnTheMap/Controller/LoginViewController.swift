@@ -46,14 +46,22 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 print(OnTheMapClient.UserDetails.firstName)
                 print(OnTheMapClient.UserDetails.lastName)
             }
-                }
-                }
+        } else {
+                self.showLoginFailure(message: "Username or password is incorrect. Please try again.")
+            }
+    }
 
 
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
         }
+    
+    func showLoginFailure(message: String) {
+               let alertVC = UIAlertController(title: "Failed to Login", message: message, preferredStyle: .alert)
+               alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+               show(alertVC, sender: nil)
+           }
 
 
 }

@@ -27,7 +27,6 @@ class PostViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func findOnMap(_ sender: UIButton) {
-         
       self.performSegue(withIdentifier: self.mapPreviewID, sender: self)
     }
     
@@ -39,6 +38,5 @@ class PostViewController: UIViewController, UITextFieldDelegate {
             vc.mapString = locationInput.text!
         }
     }
-
 }
  

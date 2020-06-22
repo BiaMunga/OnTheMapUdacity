@@ -53,13 +53,16 @@ class OnTheMapClient {
             }
             let decoder = JSONDecoder()
             do {
-                print(String(data: data, encoding: .utf8)!)
-                let responseObject = try decoder.decode(ResponseType.self, from: data)
+                let range = Range(uncheckedBounds: (5, data.count))
+                let newData = data.subdata(in: range)
+                print(String(data: newData, encoding: .utf8)!)
+                let responseObject = try decoder.decode(ResponseType.self, from: newData)
                 DispatchQueue.main.async {
                 completion(responseObject, nil)
                 }
             } catch {
                 DispatchQueue.main.async {
+                print(error)
                 completion(nil, error)
                 }
             }
@@ -70,22 +73,47 @@ class OnTheMapClient {
     }
     
     class func getStudentLocation(completion: @escaping ([StudentLocationDetails], Error?) -> Void) {
-        
-         taskForGETRequest(url: Endpoints.getStudentLocation.url, responseType: StudentLocation.self) { (students, error) in
-               if let student = students {
-                completion(student.results, nil)
-               } else {
-                   completion([], error)
-               }
-           }
-       }
+         let task = URLSession.shared.dataTask(with: Endpoints.getStudentLocation.url) { data, response, error in
+             guard let data = data else {
+                 DispatchQueue.main.async {
+                 completion([], error)
+                 }
+                 return
+             }
+             let decoder = JSONDecoder()
+             do {
+                 print(String(data: data, encoding: .utf8)!)
+                 let students = try decoder.decode(StudentLocation.self, from: data)
+                 DispatchQueue.main.async {
+                    completion(students.results, nil)
+                 }
+             } catch {
+                 DispatchQueue.main.async {
+                 print(error)
+                 completion([], error)
+                 }
+             }
+         }
+         task.resume()
+     }
+    
+//    class func getStudentLocation(completion: @escaping ([StudentLocationDetails], Error?) -> Void) {
+//
+//         taskForGETRequest(url: Endpoints.getStudentLocation.url, responseType: StudentLocation.self) { (students, error) in
+//               if let student = students {
+//                completion(student.results, nil)
+//               } else {
+//                   completion([], error)
+//               }
+//           }
+//       }
     
     class func getPublicData(completion: @escaping (PublicDataRequest?, Error?) -> Void) {
      
         taskForGETRequest(url: Endpoints.getPublicData.url, responseType: PublicDataRequest.self) { (response, error) in
             if let response = response {
-                UserDetails.firstName = response.user.firstName
-                UserDetails.lastName = response.user.lastName
+                UserDetails.firstName = response.firstName
+                UserDetails.lastName = response.lastName
                 completion(response, nil)
             } else {
                 completion(nil, error)
@@ -130,17 +158,52 @@ class OnTheMapClient {
     }
     
     class func postStudentLocation(latitude: Double, longitude: Double, mapString: String, mediaURL: String, completion: @escaping (Bool, Error?) -> Void) {
-           
+        
+        var request = URLRequest(url: Endpoints.getStudentLocation.url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        
         let body = StudentLocationPostRequest(firstName: UserDetails.firstName, lastName: UserDetails.lastName, latitude: latitude, longitude: longitude, mapString: mapString, mediaURL: mediaURL, uniqueKey: Auth.uniqueKey)
         
-        taskForPOSTRequest(url: Endpoints.getStudentLocation.url, responseType: StudentLocationPost.self, body: body) { (response, error) in
-            if let response = response {
-                completion(true, nil)
-            } else {
+        request.httpBody = try! JSONEncoder().encode(body)
+    
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data else {
+                DispatchQueue.main.async {
                 completion(false, error)
+                }
+                return
+            }
+            do {
+                print(String(data: data, encoding: .utf8)!)
+                let decoder = JSONDecoder()
+                let response = try decoder.decode(StudentLocationPost.self, from: data)
+                DispatchQueue.main.async {
+                completion(true, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                completion(false, error)
+                print(error)
+                }
             }
         }
+        task.resume()
     }
+    
+//    class func postStudentLocation(latitude: Double, longitude: Double, mapString: String, mediaURL: String, completion: @escaping (Bool, Error?) -> Void) {
+//
+//        let body = StudentLocationPostRequest(firstName: UserDetails.firstName, lastName: UserDetails.lastName, latitude: latitude, longitude: longitude, mapString: mapString, mediaURL: mediaURL, uniqueKey: Auth.uniqueKey)
+//
+//        taskForPOSTRequest(url: Endpoints.getStudentLocation.url, responseType: StudentLocationPost.self, body: body) { (response, error) in
+//            if let response = response {
+//                completion(true, nil)
+//            } else {
+//                completion(false, error)
+//            }
+//        }
+//    }
     
     class func postSession(username: String, password: String, completion: @escaping (Bool, Error?) -> Void) {
            

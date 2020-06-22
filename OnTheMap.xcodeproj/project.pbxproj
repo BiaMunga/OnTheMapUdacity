@@ -88,8 +88,8 @@
 		3F11D2462492D15B00E50909 /* OnTheMap */ = {
 			isa = PBXGroup;
 			children = (
-				3F11D282249A307600E50909 /* Data */,
 				3F11D2752494F0D100E50909 /* ParseClient */,
+				3F11D282249A307600E50909 /* Data */,
 				3F11D2652494EBB100E50909 /* Responses */,
 				3F11D2622494EA2C00E50909 /* Requests */,
 				3F11D25B2492D17300E50909 /* Controller */,

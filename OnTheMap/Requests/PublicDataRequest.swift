@@ -8,15 +8,15 @@
 
 import Foundation
 struct PublicDataRequest: Codable {
-    let user: Details
-    
-    struct Details: Codable {
-        let firstName: String
+
         let lastName: String
+        let firstName: String
+        let key: String
+        
         
     enum CodingKeys: String, CodingKey {
-        case firstName = "first_name"
         case lastName = "last_name"
-    }
+        case firstName = "first_name"
+        case key = "key"
     }
 }

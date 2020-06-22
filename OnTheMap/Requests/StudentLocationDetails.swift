@@ -9,7 +9,6 @@
 import Foundation
 
 struct StudentLocationDetails: Codable {
-   let createdAt: String
    let firstName: String
    let lastName: String
    let latitude: Double
@@ -18,5 +17,4 @@ struct StudentLocationDetails: Codable {
    let mediaURL: String
    let objectId: String
    let uniqueKey: String
-   let updatedAt: String
    }
